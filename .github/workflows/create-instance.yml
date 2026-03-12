@@ -19,21 +19,19 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Setup OCI config
+      - name: Setup OCI config and SSH key
         run: |
           mkdir -p /home/runner/.oci
           echo "${{ secrets.OCI_CONFIG }}" > /home/runner/.oci/config
           echo "${{ secrets.OCI_PRIVATE_KEY }}" > /home/runner/.oci/private_key.pem
           chmod 600 /home/runner/.oci/private_key.pem
           sed -i 's|key_file=.*|key_file=/home/runner/.oci/private_key.pem|' /home/runner/.oci/config
-          cat /home/runner/.oci/config
-
+          ssh-keygen -t rsa -b 2048 -f /home/runner/.oci/ssh_key -N ""
 
       - name: Run instance creation script
         env:
           OCI_CONFIG: /home/runner/.oci/config
+          SSH_AUTHORIZED_KEYS_FILE: /home/runner/.oci/ssh_key.pub
           OCT_FREE_AD: ${{ secrets.OCT_FREE_AD }}
           OCI_SUBNET_ID: ${{ secrets.OCI_SUBNET_ID }}
-          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
-          TELEGRAM_CHATID: ${{ secrets.TELEGRAM_CHATID }}
         run: python main.py
