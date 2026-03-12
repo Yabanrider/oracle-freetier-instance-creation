@@ -31,6 +31,7 @@ jobs:
 
       - name: Run instance creation script
         env:
+          OCI_CONFIG: /home/runner/.oci/config
           OCT_FREE_AD: ${{ secrets.OCT_FREE_AD }}
           OCI_SUBNET_ID: ${{ secrets.OCI_SUBNET_ID }}
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
