@@ -27,6 +27,19 @@ jobs:
           chmod 600 /home/runner/.oci/private_key.pem
           sed -i 's|key_file=.*|key_file=/home/runner/.oci/private_key.pem|' /home/runner/.oci/config
           ssh-keygen -t rsa -b 2048 -f /home/runner/.oci/ssh_key -N ""
+          echo "=== CONFIG DOSYASI ==="
+          cat /home/runner/.oci/config
+          echo "=== OCI ENV ==="
+          cat oci.env
+          echo "=== PRIVATE KEY BOYUTU ==="
+          wc -l /home/runner/.oci/private_key.pem
+
+      - name: Override oci.env paths
+        run: |
+          sed -i 's|OCI_CONFIG=.*|OCI_CONFIG=/home/runner/.oci/config|' oci.env
+          sed -i 's|SSH_AUTHORIZED_KEYS_FILE=.*|SSH_AUTHORIZED_KEYS_FILE=/home/runner/.oci/ssh_key.pub|' oci.env
+          echo "=== OCI ENV SONRASI ==="
+          cat oci.env
 
       - name: Run instance creation script
         env:
@@ -34,4 +47,7 @@ jobs:
           SSH_AUTHORIZED_KEYS_FILE: /home/runner/.oci/ssh_key.pub
           OCT_FREE_AD: ${{ secrets.OCT_FREE_AD }}
           OCI_SUBNET_ID: ${{ secrets.OCI_SUBNET_ID }}
-        run: python main.py
+        run: |
+          echo "=== SCRIPT BAŞLIYOR ==="
+          python -u main.py
+          echo "=== SCRIPT BİTTİ ==="
