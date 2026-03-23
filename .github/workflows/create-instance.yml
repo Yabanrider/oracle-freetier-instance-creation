@@ -29,8 +29,6 @@ jobs:
           ssh-keygen -t rsa -b 2048 -f /home/runner/.oci/ssh_key -N ""
           echo "=== CONFIG DOSYASI ==="
           cat /home/runner/.oci/config
-          echo "=== OCI ENV ==="
-          cat oci.env
           echo "=== PRIVATE KEY BOYUTU ==="
           wc -l /home/runner/.oci/private_key.pem
 
@@ -38,7 +36,7 @@ jobs:
         run: |
           sed -i 's|OCI_CONFIG=.*|OCI_CONFIG=/home/runner/.oci/config|' oci.env
           sed -i 's|SSH_AUTHORIZED_KEYS_FILE=.*|SSH_AUTHORIZED_KEYS_FILE=/home/runner/.oci/ssh_key.pub|' oci.env
-          echo "=== OCI ENV SONRASI ==="
+          echo "=== OCI ENV ==="
           cat oci.env
 
       - name: Run instance creation script
@@ -49,5 +47,11 @@ jobs:
           OCI_SUBNET_ID: ${{ secrets.OCI_SUBNET_ID }}
         run: |
           echo "=== SCRIPT BAŞLIYOR ==="
-          python -u main.py
+          timeout 300 python -u main.py || true
+          echo "=== SETUP LOG ==="
+          cat setup_and_info.log 2>/dev/null || echo "LOG YOK"
+          echo "=== LAUNCH LOG ==="
+          cat launch_instance.log 2>/dev/null || echo "LOG YOK"
+          echo "=== ERROR LOG ==="
+          cat ERROR_IN_CONFIG.log 2>/dev/null || echo "HATA YOK"
           echo "=== SCRIPT BİTTİ ==="
